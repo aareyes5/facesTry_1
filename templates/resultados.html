@@ -1,0 +1,35 @@
+<!-- templates/resultados.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Comparación</title>
+</head>
+<body>
+    <h1>Resultados de Comparación</h1>
+
+    <div id="resultados"></div>
+
+    <script>
+        const resultados = {{ resultados | tojson | safe }};
+        const resultadosDiv = document.getElementById('resultados');
+
+        if (resultados.length > 0) {
+            resultados.forEach(resultado => {
+                const divResultado = document.createElement('div');
+                divResultado.innerHTML = `
+                    <p>Imagen de Entrada:</p>
+                    <img src="data:image/jpeg;base64,${btoa(String.fromCharCode(...new Uint8Array(resultado.imagen_entrada)))}" alt="Imagen de Entrada" style="max-width: 400px;">
+                    
+                    <p>Imagen Referencia:</p>
+                    <img src="${URL.createObjectURL(resultado.imagen_referencia)}" alt="Imagen de Referencia" style="max-width: 400px;">
+                `;
+                resultadosDiv.appendChild(divResultado);
+            });
+        } else {
+            resultadosDiv.innerText = 'No se encontraron caras similares en la carpeta de imágenes.';
+        }
+    </script>
+</body>
+</html>

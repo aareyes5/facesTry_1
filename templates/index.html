@@ -1,0 +1,68 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de Caras</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" crossorigin="anonymous">
+</head>
+<body class="bg-light">
+    <div class="container text-center mt-5">
+        <h1 class="mb-4">Comparador de Caras</h1>
+        
+        <form id="compararForm" enctype="multipart/form-data">
+            <label for="imagen">Imagen de entrada:</label>
+            <input type="file" name="imagen" accept="image/*" required>
+            
+            <button type="button" class="btn btn-primary" onclick="comparar()">Comparar</button>
+        </form>
+
+        <div id="resultado-container" class="mt-4">
+            <div id="resultado"></div>
+        </div>
+    </div>
+
+    <script>
+        async function comparar() {
+            const formData = new FormData(document.getElementById('compararForm'));
+
+            try {
+                const response = await fetch('/comparar', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.length > 0) {
+                    // Muestra las imágenes relacionadas en la página
+                    const resultadoContainer = document.getElementById('resultado');
+                    resultadoContainer.innerHTML = '';
+
+                    data.forEach(item => {
+                        const porcentajeSimilitud = item.porcentaje_coincidencia.toFixed(2);
+                        const imagenReferenciaSrc = item.imagen_referencia;
+
+                        resultadoContainer.innerHTML += `
+                            <div>
+                                <p>Imagen de Comparacion:</p>
+                                <img src="${imagenReferenciaSrc}" alt="Imagen de Referencia" style="max-width: 400px;">
+                                <p>Porcentaje de Similitud: ${porcentajeSimilitud}%</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    document.getElementById('resultado').innerText = 'No se encontraron caras similares en la carpeta de imágenes.';
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
